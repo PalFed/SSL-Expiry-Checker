@@ -1,10 +1,10 @@
 <?php
 
-if (file_exists("sslChecker.ini.php")) {
-	$config=parse_ini_file("sslChecker.ini.php");
+if (file_exists(__DIR__."/sslChecker.ini.php")) {
+	$config=parse_ini_file(__DIR__."/sslChecker.ini.php");
 }
 else {
-	printError("Error: sslChecker.ini.php not found");
+	printError("Error: ".__DIR__."/sslChecker.ini.php not found");
 	exit();
 }
 
