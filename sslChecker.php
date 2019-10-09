@@ -17,7 +17,7 @@ if (isset($_GET['domain'])) {
 }
 
 ?>
-<html>
+<html lang="en">
 <head>
 	<title>SSL Checker</title>
 	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
@@ -30,7 +30,7 @@ if (isset($_GET['domain'])) {
 
 		/* From https://tobiasahlin.com/spinkit/ */
 		.spinner {
-		  margin: 0px auto 0;
+		  margin: 0 auto 0;
 		  width: 40px;
 		  text-align: center;
 		}
@@ -95,7 +95,7 @@ foreach ($config['domains'] as $domain) {
 $(document).ready(function() {
 	$("tr.not-loaded").each(function() {
 		var me=$(this);
-		$.getJSON("sslchecker.php?domain="+me.data("domain"), function(data) {			
+		$.getJSON("sslChecker.php?domain="+me.data("domain"), function(data) {
 			me.removeClass("not-loaded");
 			me.find(".expiry").html(data.expiry);
 			me.find(".days-left").html(data.daysLeft);
@@ -109,15 +109,15 @@ $(document).ready(function() {
 });
 
 function sortTable(index) {
-	var table = $("#domains")
-    var rows = table.find('tr:gt(0)').toArray().sort(comparer(index))
+	var table = $("#domains");
+    var rows = table.find('tr:gt(0)').toArray().sort(comparer(index));
     for (var i = 0; i < rows.length; i++){table.append(rows[i])}
 
 }
 
 function comparer(index) {
     return function(a, b) {
-        var valA = getCellValue(a, index), valB = getCellValue(b, index)
+        var valA = getCellValue(a, index), valB = getCellValue(b, index);
         return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.toString().localeCompare(valB)
     }
 }
@@ -156,7 +156,7 @@ function getCertDetails($domain) {
 
 function printError($msg) {
 		?>
-<html>
+<html lang="en">
 <head>
 	<title>SSL Checker</title>
 </head>
