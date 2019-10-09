@@ -1,5 +1,5 @@
 [sslChecker]
-# When to turn orange (turns red when < 0)
+# When to turn orange. Turns red when less than 0
 warnDays = 30
 
 # PHP Date format to show the expiry date.
