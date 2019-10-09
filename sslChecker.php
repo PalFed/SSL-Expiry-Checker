@@ -12,7 +12,7 @@ else {
 if (isset($_GET['domain'])) {
 	$certDetails=getCertDetails($_GET['domain']);
 	if (empty($certDetails)) print json_encode(['expiry'=>'An error occurred', 'daysLeft'=>'?', 'error'=>true]);
-	else print json_encode(['expiry'=>date($config['dateFormat'], $certDetails['validTo_time_t']), 'daysLeft'=>$certDetails['validLeft']]);
+	else print json_encode(['expiry'=>date($config['dateFormat'], $certDetails['validTo_time_t']), 'daysLeft'=>$certDetails['validLeft'], 'issuer'=>$certDetails['issuer']['O']]);
 	exit();
 }
 
@@ -76,7 +76,7 @@ if (isset($_GET['domain'])) {
 <body>
 	<h1>SSL Expiry Checker</h1>
 <table cellspacing="0" id="domains">
-<thead><tr><th>Domain</th><th>Expiry Date</th><th>Days Until Expiry</th></tr></thead>
+    <thead><tr><th>Domain</th><th>Expiry Date</th><th>Days Until Expiry</th><th>Issuer</th></tr></thead>
 <tbody>
 <?php
 foreach ($config['domains'] as $domain) {
@@ -85,6 +85,7 @@ foreach ($config['domains'] as $domain) {
 	
 	print "<td class=\"expiry\">".getSpinnerHTML()."</td>";
 	print "<td class=\"days-left\">".getSpinnerHTML()."</td>";
+	print "<td class=\"issuer\">".getSpinnerHTML()."</td>";
 	print "</tr>";
 }
 ?>
@@ -99,6 +100,7 @@ $(document).ready(function() {
 			me.removeClass("not-loaded");
 			me.find(".expiry").html(data.expiry);
 			me.find(".days-left").html(data.daysLeft);
+			me.find(".issuer").html(data.issuer);
 			if (typeof data.error !== 'undefined') me.addClass("error");
 			else if (data.daysLeft<0) me.addClass("expired");
 			else if (data.daysLeft<<?php echo $config['warnDays']; ?>) me.addClass("warn");
@@ -150,7 +152,6 @@ function getCertDetails($domain) {
     $certExpiry=strtotime(date('Y-m-d', $certInfo['validTo_time_t'])." 00:00:00");
     $now=strtotime(date('Y-m-d', time())." 00:00:00");
     $certInfo['validLeft']=floor(($certExpiry-$now)/86400);
-    
     return $certInfo;
 }
 
