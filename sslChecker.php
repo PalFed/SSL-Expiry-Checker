@@ -125,9 +125,9 @@ function comparer(index, index2) {
             return valC.toString().localeCompare(valD.toString());
         }
         else {
-        return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.toString().localeCompare(valB)
+            return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.toString().localeCompare(valB)
+        }
     }
-}
 }
 function getCellValue(row, index){ return $(row).children('td').eq(index).text() }
 </script>
