@@ -95,7 +95,7 @@ foreach ($config['domains'] as $domain) {
 <script type="text/javascript">
 $(document).ready(function() {
 	$("tr.not-loaded").each(function() {
-		var me=$(this);
+		let me=$(this);
 		$.getJSON("sslChecker.php?domain="+me.data("domain"), function(data) {
 			me.removeClass("not-loaded");
 			me.find(".expiry").html(data.expiry);
@@ -105,23 +105,29 @@ $(document).ready(function() {
 			else if (data.daysLeft<0) me.addClass("expired");
 			else if (data.daysLeft<<?php echo $config['warnDays']; ?>) me.addClass("warn");
 			else me.addClass("ok");
-			sortTable(2);
+			sortTable(2, 0);
 		});
 	});  
 });
 
-function sortTable(index) {
-	var table = $("#domains");
-    var rows = table.find('tr:gt(0)').toArray().sort(comparer(index));
+function sortTable(index, index2) {
+	let table = $("#domains");
+    let rows = table.find('tr:gt(0)').toArray().sort(comparer(index, index2));
     for (var i = 0; i < rows.length; i++){table.append(rows[i])}
 
 }
 
-function comparer(index) {
+function comparer(index, index2) {
     return function(a, b) {
-        var valA = getCellValue(a, index), valB = getCellValue(b, index);
+        let valA = getCellValue(a, index), valB = getCellValue(b, index);
+        if ($.isNumeric(valA) && $.isNumeric(valB)  && valA === valB ) {
+            let valC = getCellValue(a, index2), valD = getCellValue(b, index2);
+            return valC.toString().localeCompare(valD.toString());
+        }
+        else {
         return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.toString().localeCompare(valB)
     }
+}
 }
 function getCellValue(row, index){ return $(row).children('td').eq(index).text() }
 </script>
@@ -141,12 +147,21 @@ function getSpinnerHTML() {
 function getCertDetails($domain) {
 	$url = "https://".$domain;
     $orignalParse = parse_url($url, PHP_URL_HOST);
+    $port=parse_url($url, PHP_URL_PORT);
+    if (!$port) $port=443;
+
     $get = stream_context_create(array("ssl" => array("capture_peer_cert" => TRUE, 'verify_peer' => false,
         'verify_peer_name' => false,
         'allow_self_signed' => true)));
-    $read = stream_socket_client("ssl://".$orignalParse.":443", $errno, $errstr, 30, STREAM_CLIENT_CONNECT, $get);
+
+
+    $read = stream_socket_client("ssl://".$orignalParse.":".$port, $errno, $errstr, 30, STREAM_CLIENT_CONNECT, $get);
+
+
     $cert = stream_context_get_params($read);
-    $certInfo = openssl_x509_parse($cert['options']['ssl']['peer_certificate']);
+
+
+    $certInfo = openssl_x509_parse($cert['options']['ssl']['peer_certificate'], true);
     if (empty($certInfo)) return false;
 
     $certExpiry=strtotime(date('Y-m-d', $certInfo['validTo_time_t'])." 00:00:00");
